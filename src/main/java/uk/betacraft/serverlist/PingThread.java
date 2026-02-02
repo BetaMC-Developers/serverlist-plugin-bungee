@@ -7,14 +7,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Collectors;
-
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class PingThread extends Thread {
 
@@ -35,26 +34,26 @@ public class PingThread extends Thread {
 
                     OutputStream os = con.getOutputStream();
 
-                    ArrayList<org.bukkit.entity.Player> online = BCPing.bukkitversion.getOnlinePlayers();
+                    Collection<ProxiedPlayer> online = BungeeCord.getInstance().getPlayers();
 
                     JsonObject payload = (JsonObject) BCPing.gson.toJsonTree(BCPing.config);
 
-                    payload.addProperty("max_players", Bukkit.getServer().getMaxPlayers());
+                    payload.addProperty("max_players", BungeeCord.getInstance().config.getPlayerLimit());
                     payload.addProperty("online_players", online.size());
 
                     JsonObject software = new JsonObject();
-                    software.addProperty("name", Bukkit.getServer().getName());
-                    software.addProperty("version", Bukkit.getServer().getVersion());
+                    software.addProperty("name", BungeeCord.getInstance().getName());
+                    software.addProperty("version", BungeeCord.getInstance().getVersion());
 
                     payload.add("software", software);
-                    payload.addProperty("online_mode", Bukkit.getServer().getOnlineMode());
+                    payload.addProperty("online_mode", false);
 
                     if (BCPing.config.send_players) {
                         JsonArray playersArray = new JsonArray();
 
-                        for (Player bukkitPlayer : online) {
+                        for (ProxiedPlayer proxiedPlayer : online) {
                             JsonObject playerObject = new JsonObject();
-                            playerObject.addProperty("username", bukkitPlayer.getName());
+                            playerObject.addProperty("username", proxiedPlayer.getName());
 
                             playersArray.add(playerObject);
                         }

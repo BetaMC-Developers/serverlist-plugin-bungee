@@ -8,32 +8,24 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.logging.Logger;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Server;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import uk.betacraft.bukkitversion.BukkitVersion;
-import uk.betacraft.uberbukkit.Uberbukkit;
+import net.md_5.bungee.api.plugin.Plugin;
 
 /**
  * 
  * Uberbukkit-compliant only for Beta.
  *
  */
-public class BCPing extends JavaPlugin {
-    public static Server server;
+public class BCPing extends Plugin {
     public static Logger log;
-    public static BukkitVersion bukkitversion;
     public static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     PingThread pingThread;
     UpdateThread updateThread;
     public static Config config;
     public static boolean running = true;
-    public static boolean uberbukkit = false;
 
     public static String PLUGIN_VERSION = "";
 
@@ -41,20 +33,11 @@ public class BCPing extends JavaPlugin {
     protected static final String HOST = "https://api.betacraft.uk/v2";
 
     public void onEnable() {
-        server = this.getServer();
-        log = this.getServer().getLogger();
-        bukkitversion = new BukkitVersion(this);
+        log = this.getProxy().getLogger();
 
         PLUGIN_VERSION = this.getDescription().getVersion();
 
         log.info("[BetacraftPing] BetacraftPing v" + this.getDescription().getVersion() + " enabled.");
-
-        try {
-            Uberbukkit.getTargetPVN();
-            uberbukkit = true;
-            log.info("[BetacraftPing] Uberbukkit detected");
-        } catch (Throwable t) {}
-
 
         File pingDetailsFile = new File("plugins/BetacraftPing/ping_details.json");
         String pingDetails = null;
@@ -73,30 +56,25 @@ public class BCPing extends JavaPlugin {
             // TODO validation?
         } else {
             config = new Config();
-            String serverip = Bukkit.getServer().getIp();
+            String serverip = "";
 
             if (serverip.equals("")) {
                 serverip = getIPFromAmazon();
             }
 
-            config.socket = serverip + ":" + Bukkit.getServer().getPort();
+            config.socket = serverip + ":" + 25565;
             config.name = "A Minecraft server";
             config.description = "";
             config.category = Config.getCategory();
             config.protocol = Config.getPVN();
             config.send_players = true;
-
-            if (uberbukkit) {
-                config.game_version = config.v1_version = Config.getLatestForPVN(config.protocol);
-            } else {
-                config.game_version = config.v1_version = bukkitversion.getVersion();
-            }
+            config.game_version = config.v1_version = Config.getLatestForPVN(config.protocol);
 
             try {
                 Files.write(pingDetailsFile.toPath(), gson.toJson(config).getBytes("UTF-8"));
             } catch (Throwable t) {
                 log.warning("[BetacraftPing] Failed to write default configuration! Disabling...");
-                this.getServer().getPluginManager().disablePlugin(this);
+                onDisable();
                 running = false;
                 return;
             }

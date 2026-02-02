@@ -1,5 +1,4 @@
 name: BetacraftPing
-author: Moresteck
+author: Moresteck, BetaMC Developers
 main: uk.betacraft.serverlist.BCPing
 version: 2.1.2
-description: Pings betacraft.uk server list

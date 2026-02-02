@@ -15,7 +15,5 @@ jar {
 }
 
 dependencies {
-	// https://getbukkit.org/download/craftbukkit
-	// https://betacraft.uk/utilities
-	implementation files('lib/craftbukkit-1.0.0-SNAPSHOT.jar', 'lib/uberbukkit.jar')
+	implementation files('lib/BungeeCord.jar')
 }

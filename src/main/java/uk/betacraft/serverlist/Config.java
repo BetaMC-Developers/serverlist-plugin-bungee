@@ -4,11 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.Base64;
 
-import uk.betacraft.uberbukkit.Uberbukkit;
-
 public class Config {
-    public static uk.betacraft.bukkitversion.Config config;
-
     public String name = "";
     public String game_version = "";
     public String protocol = "";
@@ -20,11 +16,7 @@ public class Config {
     public boolean send_players = true;
 
     public static String getPVN() {
-        if (BCPing.uberbukkit) {
-            return "beta_" + Integer.toString(Uberbukkit.getTargetPVN());
-        }
-
-        switch(BCPing.bukkitversion.getVersionId()) {
+        switch(0) {
         case 0:
             return "beta_14";
         case 1:
